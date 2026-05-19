@@ -28,11 +28,17 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-63q9h(znz#1e)m&74w9#_
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-# UPDATED: Added the new Railway production host
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,malonzafx.up.railway.app,malonza-markets-production.up.railway.app,malonzafx.com').split(',')
+# UPDATED: Added Railway hosts and wildcard for subdomains
+ALLOWED_HOSTS = os.environ.get(
+    'ALLOWED_HOSTS', 
+    'localhost,127.0.0.1,malonzafx.up.railway.app,malonza-markets-production.up.railway.app,malonzafx.com,.railway.app'
+).split(',')
 
 # UPDATED: Added the new Railway host to trusted origins
-CSRF_TRUSTED_ORIGINS = os.environ.get('CSRF_TRUSTED_ORIGINS', 'https://malonzafx.up.railway.app,https://malonza-markets-production.up.railway.app,https://malonzafx.com,http://localhost,http://127.0.0.1').split(',')
+CSRF_TRUSTED_ORIGINS = os.environ.get(
+    'CSRF_TRUSTED_ORIGINS', 
+    'https://malonzafx.up.railway.app,https://malonza-markets-production.up.railway.app,https://malonzafx.com,https://*.railway.app,http://localhost,http://127.0.0.1'
+).split(',')
 
 
 # Application definition
@@ -139,8 +145,8 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# WhiteNoise for static files
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# WhiteNoise for static files - disabled temporarily to fix build
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -154,7 +160,8 @@ AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
 AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'us-east-2')
 
 # Tell Django to use S3 for file storage
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+if AWS_STORAGE_BUCKET_NAME:
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 # Optional: Set to True to ensure file names don't get overridden
 AWS_S3_FILE_OVERWRITE = False
