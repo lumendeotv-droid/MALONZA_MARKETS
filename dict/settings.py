@@ -174,9 +174,12 @@ if AWS_STORAGE_BUCKET_NAME:
 if AWS_STORAGE_BUCKET_NAME:
     MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/'
 
-# Security settings for production
+# Security settings for production - FIXED for Railway (NO SSL REDIRECT LOOP)
 if not DEBUG:
-    SECURE_SSL_REDIRECT = True
+    # IMPORTANT: Set to False on Railway - Railway handles SSL termination
+    SECURE_SSL_REDIRECT = False
+    
+    # These are safe to keep
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
@@ -184,3 +187,7 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 31536000  # 1 year
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+    
+    # Tell Django it's behind a proxy
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    USE_X_FORWARDED_HOST = True
